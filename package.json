@@ -1,0 +1,42 @@
+{
+  "name": "react-starter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/client/app.js",
+  "scripts": {
+    "start": "npm run server",
+    "build-src": "make build-src",
+    "watch-js": "watchify src/client/app.tsx -p [ tsify ] -o build/client/app.js",
+    "build-libs": "make build-libs",
+    "build-js": "browserify src/client/app.tsx -p [ tsify ] > build/client/app.js",
+    "build-server": "babel src/server --out-dir build/server",
+    "build-assets": "make build-assets",
+    "clean": "make clean",
+    "server": "node server.js",
+    "serve-build": "npm run build-server && npm run build-libs && npm run build-assets && npm run build-js",
+    "heroku-postbuild": "npm run serve-build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@blueprintjs/core": "^1.2.0",
+    "@types/react": "^0.14.51",
+    "@types/react-dom": "^0.14.19",
+    "@types/redux": "^3.6.0",
+    "browserify": "^13.1.0",
+    "express": "^4.14.0",
+    "react": "^15.3.2",
+    "react-addons-css-transition-group": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
+    "redux-devtools": "^3.3.1",
+    "redux-logger": "^2.7.4",
+    "redux-thunk": "^2.1.0",
+    "tsify": "^2.0.3",
+    "watchify": "^3.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^2.0.10"
+  }
+}
