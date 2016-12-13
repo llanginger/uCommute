@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
 import * as Blueprint from "@blueprintjs/core";
 import { 
     Tab, 
@@ -12,12 +13,18 @@ import {
     Position
  } from "@blueprintjs/core"
 
+
 // import * as thunk from "redux-thunk";
 // import * as logger from "redux-logger";
 
 // Custom Modules
 
-import * as reducers from "./store"
+import reducers from "./store"
+import { SettingsPop } from "./Settings"
+import { StopInfo } from "./StopInfo"
+import { AjaxButton } from "./AjaxButton"
+
+
 
 // const middleware = applyMiddleware(thunk, logger())
 
@@ -30,54 +37,11 @@ const colors = {
 
 }
 
-class Pop extends React.Component<{}, {}> {
-    render() {
-        let popoverContent = (
-            <div style={{
-                textAlign: "center"
-            }}>
-                <h5>Settings</h5>
-                <h5>Instructions</h5>
-                <button className="pt-button pt-popover-dismiss">Close</button>
-            </div>
-        );
 
-        return ( 
-            <Popover content={popoverContent}
-                    interactionKind={PopoverInteractionKind.CLICK}
-                    popoverClassName="pt-popover-content-sizing"
-                    position={Position.BOTTOM_RIGHT}
-                    isModal={true}
-                    useSmartPositioning={false}>
-                <button className="pt-button pt-minimal pt-icon-cog"></button>
-            </Popover>
-        )
-    }
-}
 
 // Refactor this so it's one class that takes props, obviously
 
-class StopInfo extends React.Component<{}, {}> {
-    render() {
-        let popoverContent = (
-            <div>
-                <h5>Pop Title</h5>
-                <p>You Clicked On Something</p>
-                <button className="pt-button pt-popover-dismiss">Dismiss</button>
-            </div>
-        );
 
-        return ( 
-            <Popover content={popoverContent}
-                    interactionKind={PopoverInteractionKind.CLICK}
-                    popoverClassName="pt-popover-content-sizing"
-                    position={Position.BOTTOM}
-                    useSmartPositioning={true}>
-                <button type="button" className="pt-button">Stop Info<span className="pt-icon-standard pt-icon-caret-down pt-align-right"></span></button>
-            </Popover>
-        )
-    }
-}
 
 class TimeDisplay extends React.Component <{}, {}> {
     render() {
@@ -129,15 +93,7 @@ class BusAnim extends React.Component<{}, BusAnimState> {
                 color: "white"
             }}>
                 Bus Animation goes here
-                <button 
-                    className="pt-button pt-intent-primary"
-                    onClick={() => {
-                        console.log("color changed")
-                        this.setState({ bgColor: colors.veryLate })
-                    }}
-                >
-                    Change Bg Color
-                </button>
+                <AjaxButton />
             </div>
         )
     }
@@ -154,7 +110,7 @@ class Nav extends React.Component<{}, {}> {
                     <div className="pt-navbar-group pt-align-right">
                         <StopInfo />
                         <span className="pt-navbar-divider"></span>
-                        <Pop />
+                        <SettingsPop />
                     </div>
             </nav>
         )
@@ -192,8 +148,13 @@ class App extends React.Component<{}, {}> {
     }
 }
 
+const store: any = createStore(reducers)
 
-ReactDOM.render(<App />
+
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>
 
 
 , document.getElementById("root"))

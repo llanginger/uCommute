@@ -1,6 +1,10 @@
-import { combineReducers } from "redux";
+import { Action, combineReducers } from "redux";
 
-const colorReducer = (state="#3DCC91", action) => {
+interface A<T> extends Action {
+    payload?: T;
+}
+
+const colorReducer = (state="#3DCC91", action: A<any>) => {
     switch(action.type) {
         case "ON_TIME":
             return "#3DCC91"
@@ -13,7 +17,20 @@ const colorReducer = (state="#3DCC91", action) => {
     }
 }
 
-const reducers = combineReducers({
-    colorReducer
+const busApiMainReducer = (state:any = {}, action: A<any>) => {
+    switch(action.type) {
+        case "FETCHING_DATA":
+            return
+        case "FETCHED_DATA":
+            return Object.assign({}, state, {currentData: action.payload})
+        default:
+            return state
+
+    }
+}
+
+export const reducers = combineReducers({
+    colorReducer,
+    busApiMainReducer
 })
 export default reducers;

@@ -6,8 +6,9 @@
         "noImplicitAny": false,
         "strictNullChecks": true,
         "experimentalDecorators": true,
-        "outDir": "src/client/js/",
-        "jsx": "react"
+        "outDir": "build/client",
+        "jsx": "react",
+        "lib": ["es2015", "dom"]
     },
     "exclude": [
         "node_modules"
