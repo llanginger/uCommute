@@ -23,14 +23,24 @@ var marketStop = {
   wheelchairBoarding: "UNKNOWN"
 }
 
-var OneBusApi = {
-  baseUrl     : "http://api.pugetsound.onebusaway.org/api/where/",
-  allRoutes   : "route-ids-for-agency/1",
-  arrivalsDeparturesForStop : "arrivals-and-departures-for-stop/",
-  route       : "trips-for-route/",
-  key         : "?key=4f368d44-acaf-4922-8930-12a607f4ef44",
-  D_LINE_ID   : "1_102581"
+var myCoords = {
+  lat: 47.667880,
+  lon: -122.381775
 }
+
+var OneBusApi = {
+  baseUrl                   : "http://api.pugetsound.onebusaway.org/api/where/",
+  stopsFL                   : "stops-for-location",
+  allRoutes                 : "route-ids-for-agency/1",
+  arrivalsDeparturesForStop : "arrivals-and-departures-for-stop/",
+  route                     : "trips-for-route/",
+  key                       : "?key=4f368d44-acaf-4922-8930-12a607f4ef44",
+  D_LINE_ID                 : "1_102581"
+}
+
+// http://api.pugetsound.onebusaway.org/api/where/stops-for-location.json?key=TEST&lat=47.667880&lon=-122.381775&radius=300
+
+var getStopsByLocationUrl = OneBusApi.baseUrl + OneBusApi.stopsFL + ".json" + OneBusApi.key + "&lat=" + myCoords.lat + "&lon=" + myCoords.lon + "&radius=300"
 
 var oneBusUrl = OneBusApi.baseUrl + OneBusApi.route + OneBusApi.D_LINE_ID + ".json" + OneBusApi.key + "&includeStatus=true";
 
@@ -42,13 +52,23 @@ app.use(express.static(path.join(__dirname, './build/client')));
 app.get("/oneBus", function(req, res) {
   var stuff
   request(oneBusUrl, function(error, response, body) {
-    if (!error && response.statusCode == 200) {
+    if (!error && response.statusCode === 200) {
       stuff = body
       console.log(body) // Show the HTML for the Google homepage.
     }
     res.send(stuff);
   })
   
+})
+
+app.get("/getStopsByLocation", function(reg, res) {
+  request(getStopsByLocationUrl, function(error, response, body) {
+    if (!error && response.statusCode === 200) {
+      res.send(body)
+    } else if (error) {
+      console.log(error)
+    }
+  })
 })
 
 // Listen for requests

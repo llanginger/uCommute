@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+// import * as logger from "redux-logger";
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import * as Blueprint from "@blueprintjs/core";
@@ -13,16 +14,15 @@ import {
     Position
  } from "@blueprintjs/core"
 
-
-// import * as thunk from "redux-thunk";
-// import * as logger from "redux-logger";
+// import * as thunk from "redux";
 
 // Custom Modules
 
 import reducers from "./store"
-import { SettingsPop } from "./Settings"
-import { StopInfo } from "./StopInfo"
+import { TimeDisplay } from "./TimeDisplay"
 import { AjaxButton } from "./AjaxButton"
+import { BusAnim } from "./BusAnim"
+import { Nav } from "./Nav"
 
 
 
@@ -30,105 +30,19 @@ import { AjaxButton } from "./AjaxButton"
 
 console.log("Hello World")
 
-const colors = {
-    onTime: "#3DCC91",
-    delayed: "#F29D49",
-    veryLate: "#A82A2A"
-
-}
-
-
-
 // Refactor this so it's one class that takes props, obviously
 
-
-
-class TimeDisplay extends React.Component <{}, {}> {
-    render() {
-        return (
-            <div style={{
-                marginTop: "30px",
-                height: "100px",
-                paddingTop: "10px",
-                backgroundColor: "#30404D",
-            }}>
-                <ul style={{
-                    padding: "0px",
-                    listStyleType: "none",
-                    textAlign: "center"
-                }}>
-                    <li><h4 style={{
-                        color: "white"
-                    }}>Time To Stop</h4></li>
-                    <li><h4 style={{
-                        color: "white"
-                    }}>Time To Work</h4></li>
-                </ul>
-            </div>
-        )
-    }
-}
-
-interface BusAnimState {
-    bgColor: string
-}
-
-class BusAnim extends React.Component<{}, BusAnimState> {
-    
-    constructor(props) {
-        super(props)
-        this.state = {
-            bgColor: colors.onTime
-        }
-    }
-    
-    render() {
-        
-        return (
-            <div style={{
-                height: "350px",
-                width: "375px",
-                marginTop: "30px",
-                backgroundColor: this.state.bgColor,
-                color: "white"
-            }}>
-                Bus Animation goes here
-                <AjaxButton />
-            </div>
-        )
-    }
-}
-
-class Nav extends React.Component<{}, {}> {
-    render() {
-        return (
-            <nav className="pt-navbar .modifier pt-dark">
-
-                    <div className="pt-navbar-group pt-align-left">
-                        <div className="pt-navbar-heading">uCommute</div>
-                    </div>
-                    <div className="pt-navbar-group pt-align-right">
-                        <StopInfo />
-                        <span className="pt-navbar-divider"></span>
-                        <SettingsPop />
-                    </div>
-            </nav>
-        )
-    }
-}
-
-class App extends React.Component<{}, {}> {
+class App extends React.Component<any, any> {
     render() {
         return (
             <div style={{
                 position: "relative",
                 width: "375px",
-                height: "667px",
-                backgroundColor: colors.veryLate
+                height: "667px"
             }}>
                 <Nav />
                 <TimeDisplay />
-                <BusAnim />
+                <BusAnim store={this.props.store}/>
                 <footer style={{
                     position: "absolute",
                     bottom: "0px",
@@ -148,13 +62,17 @@ class App extends React.Component<{}, {}> {
     }
 }
 
-const store: any = createStore(reducers)
+const logger: any = store => next => action => {
+  console.log('dispatching', action)
+  let result = next(action)
+  console.log('next state', store.getState())
+  return result
+}
+
+const myStore: any = createStore(reducers, applyMiddleware(logger))
+console.log(myStore)
+myStore.dispatch({type: "ON_TIME"})
+console.log(myStore)
 
 
-ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>
-
-
-, document.getElementById("root"))
+ReactDOM.render( <App store={myStore}/>, document.getElementById("root"))
