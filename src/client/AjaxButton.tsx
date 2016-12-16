@@ -2,9 +2,20 @@ import * as React from "react";
 import * as Blueprint from "@blueprintjs/core";
 import * as request from "request"
 import * as axios from "axios"
+import * as _ from "underscore";
 
 interface AJButton {
     store: any
+}
+
+const homeCoords = {
+  lat: "47.667880",
+  lon: "-122.381775"
+}
+
+const workCoords = {
+    lat: "47.606300",
+    lon: "122.336351"
 }
 
 export class AjaxButton<AJButton> extends React.Component<any, any> {
@@ -14,8 +25,10 @@ export class AjaxButton<AJButton> extends React.Component<any, any> {
     constructor(props) {
         super(props)
         this._doAjax = this._doAjax.bind(this)
-        this._getStopInfo = this._getStopInfo.bind(this)
+        this._getStopsForLocation = this._getStopsForLocation.bind(this)
         this._testDispatch = this._testDispatch.bind(this);
+        this._displayStopName = this._displayStopName.bind(this);
+        this._getRoutesForLocation = this._getRoutesForLocation.bind(this);
     }
 
     componentDidMount() {
@@ -46,9 +59,13 @@ export class AjaxButton<AJButton> extends React.Component<any, any> {
         })
     }
 
-    _getStopInfo() {
+    _getStopsForLocation() {
         this.props.store.dispatch({ type: "FETCHING_STOPS" })
-        axios.get("getStopsByLocation").then((response: {data: {}}) => {
+        axios.get("getStopsByLocation", {
+            params: {
+                radius: "300"
+            }
+        }).then((response: {data: {}}) => {
             this.props.store.dispatch({
                 type: "FETCHED_STOPS",
                 payload: response.data
@@ -56,17 +73,122 @@ export class AjaxButton<AJButton> extends React.Component<any, any> {
         })
     }
 
+    _getRoutesForLocation() {
+        this.props.store.dispatch({ type: "FETCHING_STOPS" })
+        axios.get("getStopsByLocation", {
+            params: {
+                "home": {
+                    lat: 47.667880,
+                    lon: -122.381775,
+                    radius: 300
+                },
+                "work": {
+                    lat: 47.606300,
+                    lon: -122.336351,
+                    radius: 200
+                }
+            }
+        }).then((response: {data: {}}) => {
+            // this.props.store.dispatch({
+            //     type: "FETCHED_ROUTES",
+            //     payload: response.data
+            // })
+            function returnDupes(i) {
+                var id = i.id
+                console.log(id)
+                for (var j = 0; j < this.length; j++) {
+                    if (id === this[j].id) {
+                        return [i, this[j]]
+                    }
+                }
+            }
+            const home: any[] = response.data[0].data.list
+            const work: any[] = response.data[1].data.list
+            console.log("full response: ", response)
+            console.log("Home response: ", home)
+            console.log("Work response: ", work)
+            // console.log("filter results: ", home.filter(returnDupes, work))
+        })
+    }
+
+    _displayStopName() {
+        if (this.props.store.getState().busStopInfoReducer.length > 0) {
+            return this.props.store.getState().busStopInfoReducer[0].name;
+        } else {
+            return "dummy name"
+        }
+    }
+
+
     render() {
         const props = this.props;
         const { store } = props;
         const state = store.getState()
         return (
             <div>
-                <button onClick={this._doAjax}>AjaxButton</button>
-                <button onClick={this._getStopInfo}>getStopInfo</button>
-                <button onClick={this._testDispatch}>TestReduxButton</button>
-                <div>Text Area {state.busStopInfoReducer[0].name}</div>
+                <button onClick={this._getRoutesForLocation}>Get Stop Info</button>
+                <div>Text Area {this._displayStopName()}</div>
             </div>
         )
     }
 }
+
+
+
+
+
+const homeStops = [
+    {
+        name: "homeStop1",
+        routeIds: [1, 2, 3]
+    },
+    {
+        name: "homeStop2",
+        routeIds: [4, 5, 6]
+    },
+    {
+        name: "homeStop3",
+        routeIds: [1, 4, 7]
+    }
+]
+
+const workStops = [
+    {
+        name: "workStop1",
+        routeIds: [1, 12, 3]
+    },
+    {
+        name: "workStop2",
+        routeIds: [4, 8, 6]
+    },
+    {
+        name: "workStop3",
+        routeIds: [2, 8, 5]
+    }
+]
+
+var routes = [];
+
+
+for (var i = 0; i < homeStops.length; i++) {
+
+    routes[i] = {
+        stopInfo: homeStops[i],
+        matchedRoutes: []
+    }
+
+    console.log("routes: ", routes)
+
+    for (var j = 0; j < homeStops[i].routeIds.length; j++) {
+        var route1 = homeStops[i].routeIds[j]
+
+        for (var k = 0; k < workStops.length; k++) {
+            var workStop = workStops[k].routeIds;
+            if(workStop.indexOf(route1)) {
+                console.log("test match: ", routes[i])
+                // routes[i].matchedRoutes.push("hello")
+            }
+        }
+    }
+}
+

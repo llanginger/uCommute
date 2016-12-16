@@ -29,6 +29,7 @@
     "@types/redux-logger": "^2.6.32",
     "@types/redux-thunk": "^2.1.0",
     "@types/request": "^0.0.36",
+    "@types/underscore": "^1.7.36",
     "axios": "^0.15.3",
     "browserify": "^13.1.0",
     "cors": "^2.8.1",
@@ -47,6 +48,7 @@
     "request": "^2.79.0",
     "reqwest": "^2.0.5",
     "tsify": "^2.0.3",
+    "underscore": "^1.8.3",
     "watchify": "^3.7.0"
   },
   "devDependencies": {

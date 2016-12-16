@@ -29,7 +29,7 @@ const busApiMainReducer = (state:any = {}, action: A<any>) => {
     }
 }
 
-const busStopInfoReducer = (state: any = [{ name: "dummy" }], action: A<any>) => {
+const busStopInfoReducer = (state: any = [], action: A<any>) => {
     switch(action.type) {
         case "FETCHING_STOPS":
             return state
