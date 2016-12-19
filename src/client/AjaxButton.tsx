@@ -8,6 +8,18 @@ interface AJButton {
     store: any
 }
 
+interface Route {
+    code?: string;
+    direction?: string;
+    id?: string;
+    lat?: number;
+    lon?: number;
+    name?: string;
+    routeIds?: string[] | undefined;
+    wheelchairBoarding?: string;
+    checked?: boolean;
+}
+
 const homeCoords = {
   lat: "47.667880",
   lon: "-122.381775"
@@ -89,24 +101,49 @@ export class AjaxButton<AJButton> extends React.Component<any, any> {
                 }
             }
         }).then((response: {data: {}}) => {
+            console.log("full response: ", response)
             // this.props.store.dispatch({
             //     type: "FETCHED_ROUTES",
             //     payload: response.data
             // })
-            function returnDupes(i) {
-                var id = i.id
-                console.log(id)
-                for (var j = 0; j < this.length; j++) {
-                    if (id === this[j].id) {
-                        return [i, this[j]]
+
+            let routes = []
+           
+            let home: Route[] = response.data[0].data.list
+            let work: Route[] = response.data[1].data.list
+
+            console.log("Home response: ", home)
+            console.log("Work response: ", work)
+
+            for (var stop in work) {
+                work[stop].checked = false
+            }
+
+            for (var i = 0; i < home.length; i++) {
+
+                routes.push(Object.assign(
+                    {
+                        stopInfo: home[i],
+                        matchedRoutes: []
+                    }
+                ))
+
+                console.log("routes: ", routes)
+
+                for (var j = 0; j < home[i].routeIds.length; j++) {
+                    var route1 = home[i].routeIds[j]
+
+                    for (var k = 0; k < work.length; k++) {
+                        var workRoutes = work[k].routeIds;
+                        if(workRoutes.indexOf(route1) != -1 && work[k].checked === false) {
+                            console.log("test match: ", routes[i])
+                            routes[i].matchedRoutes.push(work[k])
+                        }
                     }
                 }
             }
-            const home: any[] = response.data[0].data.list
-            const work: any[] = response.data[1].data.list
-            console.log("full response: ", response)
-            console.log("Home response: ", home)
-            console.log("Work response: ", work)
+
+            console.log("Filtered routs: ", routes)
             // console.log("filter results: ", home.filter(returnDupes, work))
         })
     }
@@ -135,60 +172,71 @@ export class AjaxButton<AJButton> extends React.Component<any, any> {
 
 
 
+// interface BusStop {
+//     name: string;
+//     routeIds: number[];
+//     checked?: boolean 
+// }
 
+// const homeStops: BusStop[] = [
+//     {
+//         name: "homeStop1",
+//         routeIds: [1, 2, 3]
+//     },
+//     {
+//         name: "homeStop2",
+//         routeIds: [4, 5, 6]
+//     },
+//     {
+//         name: "homeStop3",
+//         routeIds: [1, 4, 7]
+//     }
+// ]
 
-const homeStops = [
-    {
-        name: "homeStop1",
-        routeIds: [1, 2, 3]
-    },
-    {
-        name: "homeStop2",
-        routeIds: [4, 5, 6]
-    },
-    {
-        name: "homeStop3",
-        routeIds: [1, 4, 7]
-    }
-]
+// const workStops: BusStop[] = [
+//     {
+//         name: "workStop1",
+//         routeIds: [1, 12, 3]
+//     },
+//     {
+//         name: "workStop2",
+//         routeIds: [4, 8, 6]
+//     },
+//     {
+//         name: "workStop3",
+//         routeIds: [2, 8, 5]
+//     }
+// ]
 
-const workStops = [
-    {
-        name: "workStop1",
-        routeIds: [1, 12, 3]
-    },
-    {
-        name: "workStop2",
-        routeIds: [4, 8, 6]
-    },
-    {
-        name: "workStop3",
-        routeIds: [2, 8, 5]
-    }
-]
+// var routes = [];
 
-var routes = [];
+// for (var stop in workStops) {
+//     workStops[stop].checked = false
+// }
 
+// for (var i = 0; i < homeStops.length; i++) {
 
-for (var i = 0; i < homeStops.length; i++) {
+//     routes.push(Object.assign(
+//         {
+//             stopInfo: homeStops[i],
+//             matchedRoutes: []
+//         }
+//     ))
 
-    routes[i] = {
-        stopInfo: homeStops[i],
-        matchedRoutes: []
-    }
+//     console.log("routes: ", routes)
 
-    console.log("routes: ", routes)
+//     for (var j = 0; j < homeStops[i].routeIds.length; j++) {
+//         var route1 = homeStops[i].routeIds[j]
 
-    for (var j = 0; j < homeStops[i].routeIds.length; j++) {
-        var route1 = homeStops[i].routeIds[j]
-
-        for (var k = 0; k < workStops.length; k++) {
-            var workStop = workStops[k].routeIds;
-            if(workStop.indexOf(route1)) {
-                console.log("test match: ", routes[i])
-                // routes[i].matchedRoutes.push("hello")
-            }
-        }
-    }
-}
+//         for (var k = 0; k < workStops.length; k++) {
+//             var workRoutes = workStops[k].routeIds;
+//             if(workRoutes.indexOf(route1) != -1 && workStops[k].checked === false) {
+//                 console.log("test match: ", routes[i])
+//                 routes[i].matchedRoutes.push(workStops[k])
+//             } else if (workRoutes.indexOf(route1) === -1) {
+//                 routes[i].matchedRoutes.push({ noMatch: true})
+//             }
+//         }
+//     }
+// }
 
